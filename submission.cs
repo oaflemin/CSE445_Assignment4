@@ -1,20 +1,22 @@
 ﻿using System;
-using System.Xml;
 using System.Xml.Schema;
-using System.Text;
+using System.Xml;
 using Newtonsoft.Json;
+using System.IO;
+using System.Text;
 
 namespace ConsoleApp1
 {
     public class Submission
     {
-        // URLs point to my GitHub Pages where the files are hosted
+        // These URLs point to my GitHub Pages site where the files are hosted
         public static string xmlURL = "https://oaflemin.github.io/CSE445_Assignment4/NationalParks.xml"; //Q1.2
         public static string xmlErrorURL = "https://oaflemin.github.io/CSE445_Assignment4/NationalParksErrors.xml"; //Q1.3
-        public static string xsdURL = "https://oaflemin.github.io/CSE445_Assignment4/NationalParks.xsd"; //Q1
+        public static string xsdURL = "https://oaflemin.github.io/CSE445_Assignment4/NationalParks.xsd"; //Q1.1
 
         public static void Main(string[] args)
         {
+            // Q3: Run all three required operations
 
             // 1) Validate the good XML file against the schema 
             string result = Verification(xmlURL, xsdURL);
@@ -31,20 +33,31 @@ namespace ConsoleApp1
             Console.ReadLine();
         }
 
+        // Q2.1
         // Takes a URL to an XML file and a URL to an XSD file, and checks if the
-        // XML follows the rules defined in the XSD. Returns a message describing
-        // any errors found, or a success message if there are none.
+        // XML follows the rules defined in the XSD. 
         public static string Verification(string xmlUrl, string xsdUrl)
         {
             StringBuilder errors = new StringBuilder();
 
             try
             {
+                // Download both files as plain text first instead of letting
+                // XmlReader hit the URL directly
+                string xmlContent = DownloadContent(xmlUrl);
+                string xsdContent = DownloadContent(xsdUrl);
+
                 // Settings object tells the XmlReader to validate against a schema
                 XmlReaderSettings settings = new XmlReaderSettings();
                 settings.ValidationType = ValidationType.Schema;
 
-                settings.Schemas.Add(null, xsdUrl);
+                // Load the schema from the downloaded text instead of a URL
+                using (StringReader xsdStringReader = new StringReader(xsdContent))
+                using (XmlReader xsdReader = XmlReader.Create(xsdStringReader))
+                {
+                    XmlSchema schema = XmlSchema.Read(xsdReader, null);
+                    settings.Schemas.Add(schema);
+                }
 
                 // Every time a validation error is found, this event fires
                 settings.ValidationEventHandler += (sender, e) =>
@@ -52,8 +65,9 @@ namespace ConsoleApp1
                     errors.AppendLine(e.Message);
                 };
 
-                // Create a reader using our settings and read through the whole file
-                using (XmlReader reader = XmlReader.Create(xmlUrl, settings))
+                // Create a reader over the downloaded XML text and read through the whole file
+                using (StringReader xmlStringReader = new StringReader(xmlContent))
+                using (XmlReader reader = XmlReader.Create(xmlStringReader, settings))
                 {
                     while (reader.Read()) { }
                 }
@@ -69,6 +83,7 @@ namespace ConsoleApp1
                 errors.AppendLine("Error: " + ex.Message);
             }
 
+            // If nothing was added to errors
             if (errors.Length == 0)
             {
                 return "No errors are found";
@@ -79,79 +94,146 @@ namespace ConsoleApp1
             }
         }
 
+        // Q2.2
         // Takes a URL to an XML file and converts it into a Json string
         public static string Xml2Json(string xmlUrl)
         {
-            // Load the XML file into an XmlDocument 
+            // Download the XML content as text, then load it into an XmlDocument
+            string xmlContent = DownloadContent(xmlUrl);
+
             XmlDocument doc = new XmlDocument();
-            doc.Load(xmlUrl);
+            doc.LoadXml(xmlContent);
 
-            Newtonsoft.Json.Linq.JArray parkArray = new Newtonsoft.Json.Linq.JArray();
-
-            // Go through every NationalPark node under the root
-            foreach (XmlNode parkNode in doc.DocumentElement.ChildNodes)
-            {
-                if (parkNode.Name != "NationalPark")
-                {
-                    continue;
-                }
-
-                Newtonsoft.Json.Linq.JObject parkObject = new Newtonsoft.Json.Linq.JObject();
-
-                // Collect all phone numbers into a list since there can be more than one
-                Newtonsoft.Json.Linq.JArray phoneArray = new Newtonsoft.Json.Linq.JArray();
-
-                foreach (XmlNode child in parkNode.ChildNodes)
-                {
-                    if (child.Name == "Name")
-                    {
-                        parkObject["Name"] = child.InnerText;
-                    }
-                    else if (child.Name == "Phone")
-                    {
-                        phoneArray.Add(child.InnerText);
-                    }
-                    else if (child.Name == "Address")
-                    {
-                        Newtonsoft.Json.Linq.JObject addressObject = new Newtonsoft.Json.Linq.JObject();
-
-                        foreach (XmlNode addressChild in child.ChildNodes)
-                        {
-                            addressObject[addressChild.Name] = addressChild.InnerText;
-                        }
-
-                        // NearestAirport is an attribute on Address, not a child element,
-                        // so we grab it separately and prefix it with @ like the sample shows
-                        if (child.Attributes["NearestAirport"] != null)
-                        {
-                            addressObject["@NearestAirport"] = child.Attributes["NearestAirport"].Value;
-                        }
-
-                        parkObject["Phone"] = phoneArray;
-                        parkObject["Address"] = addressObject;
-                    }
-                }
-
-                // Rating is an attribute on NationalPark itself
-                if (parkNode.Attributes["Rating"] != null)
-                {
-                    parkObject["@Rating"] = parkNode.Attributes["Rating"].Value;
-                }
-
-                parkArray.Add(parkObject);
-            }
-
-            // Wrap everything in the outer NationalParks -> NationalPark structure
+            // Convert starting from the root element, then wrap it in one
+            // more object using the root's own name as the key
             Newtonsoft.Json.Linq.JObject root = new Newtonsoft.Json.Linq.JObject();
-            Newtonsoft.Json.Linq.JObject nationalParksWrapper = new Newtonsoft.Json.Linq.JObject();
+            root[doc.DocumentElement.Name] = ElementToJson(doc.DocumentElement);
 
-            nationalParksWrapper["NationalPark"] = parkArray;
-            root["NationalParks"] = nationalParksWrapper;
-
-            // Indented makes it readable when printed to console
             string jsonText = root.ToString(Newtonsoft.Json.Formatting.Indented);
 
             return jsonText;
+        }
+
+        // Recursively converts one XML element into a Json value
+        private static Newtonsoft.Json.Linq.JToken ElementToJson(XmlElement element)
+        {
+            // Simple case: no attributes and no child elements at all
+            if (GetRealAttributes(element).Count == 0 && !HasChildElements(element))
+            {
+                return element.InnerText;
+            }
+
+            Newtonsoft.Json.Linq.JObject obj = new Newtonsoft.Json.Linq.JObject();
+
+            // Add attributes first, each prefixed with @
+            foreach (XmlAttribute attr in GetRealAttributes(element))
+            {
+                obj["@" + attr.LocalName] = attr.Value;
+            }
+
+            // Collect just the real child elements
+            var childElements = new System.Collections.Generic.List<XmlElement>();
+            foreach (XmlNode child in element.ChildNodes)
+            {
+                if (child.NodeType == XmlNodeType.Element)
+                {
+                    childElements.Add((XmlElement)child);
+                }
+            }
+
+            // If there were no child elements, but there were attributes,
+            // still keep the element's own text under a #text key
+            if (childElements.Count == 0)
+            {
+                if (!string.IsNullOrEmpty(element.InnerText))
+                {
+                    obj["#text"] = element.InnerText;
+                }
+                return obj;
+            }
+
+            // Count how many times each child element name appears
+            var nameCounts = new System.Collections.Generic.Dictionary<string, int>();
+            foreach (XmlElement child in childElements)
+            {
+                if (nameCounts.ContainsKey(child.Name))
+                {
+                    nameCounts[child.Name]++;
+                }
+                else
+                {
+                    nameCounts[child.Name] = 1;
+                }
+            }
+
+            foreach (XmlElement child in childElements)
+            {
+                Newtonsoft.Json.Linq.JToken childValue = ElementToJson(child);
+
+                // Phone always becomes an array, even if there's only one
+                bool forceArray = (child.Name == "Phone") || (nameCounts[child.Name] > 1);
+
+                if (forceArray)
+                {
+                    // This name repeats, so collect all of them into one array
+                    if (obj[child.Name] == null)
+                    {
+                        obj[child.Name] = new Newtonsoft.Json.Linq.JArray();
+                    }
+
+                    ((Newtonsoft.Json.Linq.JArray)obj[child.Name]).Add(childValue);
+                }
+                else
+                {
+                    obj[child.Name] = childValue;
+                }
+            }
+
+            return obj;
+        }
+
+        // Returns only the real attributes on an element, skipping namespace
+        // declarations like xmlns, xmlns:xsi, and xsi:noNamespaceSchemaLocation
+        private static System.Collections.Generic.List<XmlAttribute> GetRealAttributes(XmlElement element)
+        {
+            var result = new System.Collections.Generic.List<XmlAttribute>();
+
+            foreach (XmlAttribute attr in element.Attributes)
+            {
+                bool isNamespaceDeclaration =
+                    attr.Name == "xmlns" ||
+                    attr.Name.StartsWith("xmlns:") ||
+                    attr.NamespaceURI == "http://www.w3.org/2001/XMLSchema-instance";
+
+                if (!isNamespaceDeclaration)
+                {
+                    result.Add(attr);
+                }
+            }
+
+            return result;
+        }
+
+        // Checks if an element has at least one child that is itself an element
+        private static bool HasChildElements(XmlElement element)
+        {
+            foreach (XmlNode child in element.ChildNodes)
+            {
+                if (child.NodeType == XmlNodeType.Element)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Helper method to download content from URL
+        private static string DownloadContent(string url)
+        {
+            using (System.Net.WebClient client = new System.Net.WebClient())
+            {
+                return client.DownloadString(url);
+            }
         }
     }
 }
