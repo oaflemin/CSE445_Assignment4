@@ -42,18 +42,19 @@ namespace ConsoleApp1
 
             try
             {
-                // Download both files as plain text first instead of letting
-                // XmlReader hit the URL directly
-                string xmlContent = DownloadContent(xmlUrl);
-                string xsdContent = DownloadContent(xsdUrl);
+                // Download both files as raw bytes instead of as a pre-decoded
+                // string, so XmlReader can detect the correct encoding itself
+                // from each file's own <?xml ... encoding="..."?> declaration
+                byte[] xmlBytes = DownloadBytes(xmlUrl);
+                byte[] xsdBytes = DownloadBytes(xsdUrl);
 
                 // Settings object tells the XmlReader to validate against a schema
                 XmlReaderSettings settings = new XmlReaderSettings();
                 settings.ValidationType = ValidationType.Schema;
 
-                // Load the schema from the downloaded text instead of a URL
-                using (StringReader xsdStringReader = new StringReader(xsdContent))
-                using (XmlReader xsdReader = XmlReader.Create(xsdStringReader))
+                // Load the schema from the downloaded bytes
+                using (MemoryStream xsdStream = new MemoryStream(xsdBytes))
+                using (XmlReader xsdReader = XmlReader.Create(xsdStream))
                 {
                     XmlSchema schema = XmlSchema.Read(xsdReader, null);
                     settings.Schemas.Add(schema);
@@ -65,9 +66,9 @@ namespace ConsoleApp1
                     errors.AppendLine(e.Message);
                 };
 
-                // Create a reader over the downloaded XML text and read through the whole file
-                using (StringReader xmlStringReader = new StringReader(xmlContent))
-                using (XmlReader reader = XmlReader.Create(xmlStringReader, settings))
+                // Create a reader over the downloaded XML bytes and read through the whole file
+                using (MemoryStream xmlStream = new MemoryStream(xmlBytes))
+                using (XmlReader reader = XmlReader.Create(xmlStream, settings))
                 {
                     while (reader.Read()) { }
                 }
@@ -98,11 +99,15 @@ namespace ConsoleApp1
         // Takes a URL to an XML file and converts it into a Json string
         public static string Xml2Json(string xmlUrl)
         {
-            // Download the XML content as text, then load it into an XmlDocument
-            string xmlContent = DownloadContent(xmlUrl);
+            // Download the XML as raw bytes so XmlDocument can detect the
+            // correct encoding itself instead of assuming one
+            byte[] xmlBytes = DownloadBytes(xmlUrl);
 
             XmlDocument doc = new XmlDocument();
-            doc.LoadXml(xmlContent);
+            using (MemoryStream xmlStream = new MemoryStream(xmlBytes))
+            {
+                doc.Load(xmlStream);
+            }
 
             // Convert starting from the root element, then wrap it in one
             // more object using the root's own name as the key
@@ -126,6 +131,7 @@ namespace ConsoleApp1
             Newtonsoft.Json.Linq.JObject obj = new Newtonsoft.Json.Linq.JObject();
 
             // Add attributes first, each prefixed with @
+            // Skip namespace declarations like xmlns and xsi
             foreach (XmlAttribute attr in GetRealAttributes(element))
             {
                 obj["@" + attr.LocalName] = attr.Value;
@@ -227,7 +233,17 @@ namespace ConsoleApp1
             return false;
         }
 
-        // Helper method to download content from URL
+        // Helper method to download content from URL as raw bytes.
+
+        private static byte[] DownloadBytes(string url)
+        {
+            using (System.Net.WebClient client = new System.Net.WebClient())
+            {
+                return client.DownloadData(url);
+            }
+        }
+
+        // Helper method to download content from URL as a string.
         private static string DownloadContent(string url)
         {
             using (System.Net.WebClient client = new System.Net.WebClient())
