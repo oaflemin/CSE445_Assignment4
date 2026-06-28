@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
   <!-- Root element: NationalParks, holds one or more NationalPark elements -->
-  <xs:element name="NationalParks" type="NationalParksType"/>
+  <xsd:element name="NationalParks">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="NationalPark" maxOccurs="unbounded">
+          <xsd:complexType>
+            <xsd:sequence>
+              <!-- Name comes first -->
+              <xsd:element name="Name" type="xsd:string"/>
 
-  <xs:complexType name="NationalParksType">
-    <xs:sequence>
-      <xs:element name="NationalPark" type="NationalParkType" maxOccurs="unbounded"/>
-    </xs:sequence>
-  </xs:complexType>
+              <!-- Multiple Phone elements allowed, at least one required -->
+              <xsd:element name="Phone" type="xsd:string" maxOccurs="unbounded"/>
 
-  <xs:complexType name="NationalParkType">
-    <xs:sequence>
-      <!-- Name comes first -->
-      <xs:element name="Name" type="xs:string"/>
+              <!-- Address is its own complex element -->
+              <xsd:element name="Address">
+                <xsd:complexType>
+                  <xsd:sequence>
+                    <xsd:element name="Number" type="xsd:string"/>
+                    <xsd:element name="Street" type="xsd:string"/>
+                    <xsd:element name="City" type="xsd:string"/>
+                    <xsd:element name="State" type="xsd:string"/>
+                    <xsd:element name="Zip" type="xsd:string"/>
+                  </xsd:sequence>
+                  <!-- NearestAirport is a required attribute on Address -->
+                  <xsd:attribute name="NearestAirport" type="xsd:string" use="required"/>
+                </xsd:complexType>
+              </xsd:element>
+            </xsd:sequence>
+            <!-- Rating is an optional attribute on NationalPark -->
+            <xsd:attribute name="Rating" type="xsd:decimal" use="optional"/>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
 
-      <!-- Multiple Phone elements allowed, at least one required -->
-      <xs:element name="Phone" type="xs:string" maxOccurs="unbounded"/>
-
-      <!-- Address is its own named complex type -->
-      <xs:element name="Address" type="AddressType"/>
-    </xs:sequence>
-    <!-- Rating is an optional attribute on NationalPark -->
-    <xs:attribute name="Rating" type="xs:decimal" use="optional"/>
-  </xs:complexType>
-
-  <xs:complexType name="AddressType">
-    <xs:sequence>
-      <xs:element name="Number" type="xs:string"/>
-      <xs:element name="Street" type="xs:string"/>
-      <xs:element name="City" type="xs:string"/>
-      <xs:element name="State" type="xs:string"/>
-      <xs:element name="Zip" type="xs:string"/>
-    </xs:sequence>
-    <!-- NearestAirport is a required attribute on Address -->
-    <xs:attribute name="NearestAirport" type="xs:string" use="required"/>
-  </xs:complexType>
-
-</xs:schema>
+</xsd:schema>
