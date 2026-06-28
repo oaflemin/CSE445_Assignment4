@@ -2,55 +2,54 @@
 <NationalParks xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                xsi:schemaLocation="https://oaflemin.github.io/CSE445_Assignment4/NationalParks.xsd">
 
-  <NationalPark Rating="4.9">
+  <NationalPark>
     <Name>Grand Canyon</Name>
     <Phone>928-638-7496</Phone>
     <Phone>888-297-2757</Phone>
     <Phone>866-499-2574</Phone>
-    <Address NearestAirport="FlagStaff">
-      <Number>8</Number>
-      <Street>S Entrance Road</Street>
-      <City>Grand Canyon</City>
-      <State>AZ</State>
-      <Zip>86023</Zip>
-    </Address>
+    <Number>8</Number>
+    <Street>S Entrance Road</Street>
+    <City>Grand Canyon</City>
+    <State>AZ</State>
+    <Zip>86023</Zip>
+    <Rating>4.9</Rating>
+    <NearestAirport>FlagStaff</NearestAirport>
   </NationalPark>
 
-  <NationalPark Rating="4.8">
+  <NationalPark>
     <Name>Yellowstone</Name>
     <Phone>307-344-7381</Phone>
-    <Address NearestAirport="Jackson Hole">
-      <Number>2</Number>
-      <Street>Park Road</Street>
-      <City>Yellowstone National Park</City>
-      <State>WY</State>
-      <Zip>82190</Zip>
-    </Address>
+    <Number>2</Number>
+    <Street>Park Road</Street>
+    <City>Yellowstone National Park</City>
+    <State>WY</State>
+    <Zip>82190</Zip>
+    <Rating>4.8</Rating>
+    <NearestAirport>Jackson Hole</NearestAirport>
   </NationalPark>
 
   <NationalPark>
     <Name>Yosemite</Name>
     <Phone>209-372-0200</Phone>
     <Phone>209-372-0201</Phone>
-    <Address NearestAirport="Fresno">
-      <Number>9035</Number>
-      <Street>Village Drive</Street>
-      <City>Yosemite Village</City>
-      <State>CA</State>
-      <Zip>95389</Zip>
-    </Address>
+    <Number>9035</Number>
+    <Street>Village Drive</Street>
+    <City>Yosemite Village</City>
+    <State>CA</State>
+    <Zip>95389</Zip>
+    <NearestAirport>Fresno</NearestAirport>
   </NationalPark>
 
-  <NationalPark Rating="4.7">
+  <NationalPark>
     <Name>Zion</Name>
     <Phone>435-772-3256</Phone>
-    <Address NearestAirport="St George">
-      <Number>1</Number>
-      <Street>Zion Canyon Scenic Drive</Street>
-      <City>Springdale</City>
-      <State>UT</State>
-      <Zip>84767</Zip>
-    </Address>
+    <Number>1</Number>
+    <Street>Zion Canyon Scenic Drive</Street>
+    <City>Springdale</City>
+    <State>UT</State>
+    <Zip>84767</Zip>
+    <Rating>4.7</Rating>
+    <NearestAirport>St George</NearestAirport>
   </NationalPark>
 
   <NationalPark>
@@ -58,87 +57,83 @@
     <Phone>970-586-1206</Phone>
     <Phone>970-586-1207</Phone>
     <Phone>970-586-1208</Phone>
-    <Address NearestAirport="Denver">
-      <Number>1000</Number>
-      <Street>Highway 36</Street>
-      <City>Estes Park</City>
-      <State>CO</State>
-      <Zip>80517</Zip>
-    </Address>
+    <Number>1000</Number>
+    <Street>Highway 36</Street>
+    <City>Estes Park</City>
+    <State>CO</State>
+    <Zip>80517</Zip>
+    <NearestAirport>Denver</NearestAirport>
   </NationalPark>
 
-  <NationalPark Rating="4.6">
+  <NationalPark>
     <Name>Acadia</Name>
     <Phone>207-288-3338</Phone>
-    <Address NearestAirport="Bangor">
-      <Number>25</Number>
-      <Street>Visitor Center Road</Street>
-      <City>Bar Harbor</City>
-      <State>ME</State>
-      <Zip>04609</Zip>
-    </Address>
+    <Number>25</Number>
+    <Street>Visitor Center Road</Street>
+    <City>Bar Harbor</City>
+    <State>ME</State>
+    <Zip>04609</Zip>
+    <Rating>4.6</Rating>
+    <NearestAirport>Bangor</NearestAirport>
   </NationalPark>
 
   <NationalPark>
     <Name>Grand Teton</Name>
     <Phone>307-739-3300</Phone>
-    <Address NearestAirport="Jackson Hole">
-      <Number>100</Number>
-      <Street>Headquarters Lane</Street>
-      <City>Moose</City>
-      <State>WY</State>
-      <Zip>83012</Zip>
-    </Address>
+    <Number>100</Number>
+    <Street>Headquarters Lane</Street>
+    <City>Moose</City>
+    <State>WY</State>
+    <Zip>83012</Zip>
+    <NearestAirport>Jackson Hole</NearestAirport>
   </NationalPark>
 
-  <NationalPark Rating="4.5">
+  <NationalPark>
     <Name>Glacier</Name>
     <Phone>406-888-7800</Phone>
     <Phone>406-888-7801</Phone>
-    <Address NearestAirport="Kalispell">
-      <Number>64</Number>
-      <Street>Going-to-the-Sun Road</Street>
-      <City>West Glacier</City>
-      <State>MT</State>
-      <Zip>59936</Zip>
-    </Address>
+    <Number>64</Number>
+    <Street>Going-to-the-Sun Road</Street>
+    <City>West Glacier</City>
+    <State>MT</State>
+    <Zip>59936</Zip>
+    <Rating>4.5</Rating>
+    <NearestAirport>Kalispell</NearestAirport>
   </NationalPark>
 
   <NationalPark>
     <Name>Olympic</Name>
     <Phone>360-565-3130</Phone>
-    <Address NearestAirport="Seattle">
-      <Number>600</Number>
-      <Street>East Park Avenue</Street>
-      <City>Port Angeles</City>
-      <State>WA</State>
-      <Zip>98362</Zip>
-    </Address>
+    <Number>600</Number>
+    <Street>East Park Avenue</Street>
+    <City>Port Angeles</City>
+    <State>WA</State>
+    <Zip>98362</Zip>
+    <NearestAirport>Seattle</NearestAirport>
   </NationalPark>
 
-  <NationalPark Rating="4.4">
+  <NationalPark>
     <Name>Sequoia</Name>
     <Phone>559-565-3341</Phone>
     <Phone>559-565-3342</Phone>
-    <Address NearestAirport="Fresno">
-      <Number>47050</Number>
-      <Street>Generals Highway</Street>
-      <City>Three Rivers</City>
-      <State>CA</State>
-      <Zip>93271</Zip>
-    </Address>
+    <Number>47050</Number>
+    <Street>Generals Highway</Street>
+    <City>Three Rivers</City>
+    <State>CA</State>
+    <Zip>93271</Zip>
+    <Rating>4.4</Rating>
+    <NearestAirport>Fresno</NearestAirport>
   </NationalPark>
 
   <NationalPark>
     <Name>Joshua Tree</Name>
     <Phone>760-367-5500</Phone>
-    <Address NearestAirport="Palm Springs">
-      <Number>74485</Number>
-      <Street>National Park Drive</Street>
-      <City>Twentynine Palms</City>
-      <State>CA</State>
-      <Zip>92277</Zip>
-    </Address>
+    <Number>74485</Number>
+    <Street>National Park Drive</Street>
+    <City>Twentynine Palms</City>
+    <State>CA</State>
+    <Zip>92277</Zip>
+    <NearestAirport>Palm Springs</NearestAirport>
   </NationalPark>
 
 </NationalParks>
