@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="https://oaflemin.github.io/CSE445_Assignment4/NationalParks"
+            targetNamespace="https://oaflemin.github.io/CSE445_Assignment4/NationalParks"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
 
   <!-- Root element: NationalParks, holds one or more NationalPark elements -->
   <xsd:element name="NationalParks">
